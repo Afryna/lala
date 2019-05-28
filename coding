@@ -1,0 +1,156 @@
+#
+# This is a Shiny web application. You can run the application by clicking
+# the 'Run App' button above.
+#
+# Find out more about building applications with Shiny here:
+#
+#    http://shiny.rstudio.com/
+#
+library(shiny)
+library(shinydashboard)
+
+mydata<-read.csv(file = "https://raw.githubusercontent.com/Afryna/lala/master/2018.csv", stringsAsFactors = TRUE, header = TRUE)
+#setwd("C:\Users\afryn\Documents\WhoIsHappy")
+
+
+#Data import and Cleaning
+#wh18 <- fread("https://raw.githubusercontent.com/Afryna/lala/master/2018.csv", data.table = FALSE)
+
+#wh18$year <- 2018
+
+names(mydata)[1] <- "Happiness Rank"
+names(mydata)[2] <- "Country Rank"
+names(mydata)[3] <- "Happiness Score"
+mydata <- data.matrix(mydata)
+
+names(mydata) <- c("Country", "Happiness_Rank", "Happiness_Score")
+
+dimnames (mydata) = list (c("1","2","3","4","5","6","7","8","9","10"),
+                          c("Southern Asia" = "a","Central and Eastern Europe" = "b","North America" = "c","Southeastern Asia" = "d","Western Europe" = "e","Australia and New Zealand" = "f","Eastern Asia" = "g","Sub-Saharan Africa" = "h"), selected = "a")
+
+fields <- c("text_demo","slider_demo", "submit_demo", "radio_demo", "action_demo")
+
+#saveData <- function(input){
+#put variables in a data frame
+# data <- data.frame(matrix(nrow=1,ncol=0))
+#for (x in fields) {
+# var <- input[[x]]
+#  if (length(var)>1) {
+#   data[[x]] <- list (var)
+#} else {
+# data[[x]] <- var
+#}
+#}
+#data$submit <- submitbutton()
+#}
+
+
+
+radio_demo <- radioButtons(
+  "radio_demo",
+  "Do you think your country is a happy country?",
+  c("Yes","No"),
+  inline = TRUE
+)
+
+
+text_demo <- textInput (
+  "text_demo",
+  "Which country do you think the happiest?"
+)
+
+action_demo <- actionButton(
+  "clear",
+  "Clear Form"
+)
+
+
+resetForm <- function (session) {
+  updateTextInput(session, "text_demo", value = "")
+  updateRadioButtons(session, "text_demo", value = "Yes")
+  updateSliderInput(session, "slider_demo", value = 50)
+}
+
+# Define UI for application that draws a histogram
+shinyUI <- fluidPage(
+  
+  # Application title
+  titlePanel("The Happy Countries"),
+  tags$head(
+    tags$style(HTML("
+                    .shiny-input-container:not(.shiny-input-container-inline){
+                    width: 100%;
+                    max-width: 100%;
+                    }"
+     )),
+    
+    ggplot() + 
+      geom_map(data=world, map=world,
+               aes(x=long, y=lat, group=group, map_id=region),
+               fill="white", colour="black") + 
+      geom_map(data=happiness.score17, map=world,
+               aes(fill=Happiness_Score, map_id=Country),
+               colour="black") + 
+      scale_fill_continuous(low="red", high="yellow",
+                            guide="colorbar") + 
+      labs(title = "World Happiness Score in 2017"),
+    
+    
+    sidebarLayout(
+      sidebarPanel(
+        selectInput(inputId = "gen",  # Give the input a name "genotype"
+                    label = "1. Select a region",  # Give the input a label to be displayed in the app
+                    choices = c("Southern Asia" = "a","Central and Eastern Europe" = "b","North America" = "c","Southeastern Asia" = "d","Western Europe" = "e","Australia and New Zealand" = "f","Eastern Asia" = "g","Sub-Saharan Africa" = "h"), selected = "a"),  # Create the choices that can be selected. e.g. Display "A" and link to value "a"
+        selectInput(inputId = "colour", 
+                    label = "2. Which rank do you want to know?", 
+                    choices = c("Top 5","Worst 5"), selected = "Worst 5"),
+        sliderInput(inputId = "bin", 
+                    label = "3.How would you rank the happines of the country you live in(currently), on a scale from 0-10?",
+                    min=0, max=10, value= c(5))
+        #textInput(inputId = "text", 
+        # label = "4. Enter some text to be displayed", "")
+      ),
+      mainPanel()
+    ),
+    
+    
+    h3("My Survey"),
+    p("Please fill out the following brief survey..."),
+    
+    fluidRow(
+      column(width=6, text_demo)
+    ),
+    
+    fluidRow(
+      column(width=4, radio_demo)
+    ),
+    
+    actionButton("submit",  "Submit"),
+    action_demo
+    )
+    )
+
+
+
+
+# Define server logic required to draw a histogram
+server <- function(input, output, session){
+  observeEvent(input$submit,{
+    resetForm(session)
+    
+    #thank user
+    n_responses <- length(list.files(outputDir))
+    responses <- paste0("Thank you for completing the survey! Stay happy anywhere!",
+                        n_responses, ".")
+    showNotification(response, duration=0, type = "message")
+  })
+  
+  observeEvent(input$clear, {
+    resetForm(session)
+  })
+  
+  
+}
+
+# Run the application 
+shinyApp(ui= shinyUI, server=server)
