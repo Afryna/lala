@@ -11,6 +11,8 @@ library (data.table)
 library (tidyverse)
 library(DT)
 library (corrplot)
+
+library(wildcard)
 library (plotly)
 library (ggplot2)
 library (PerformanceAnalytics)
@@ -53,7 +55,7 @@ corrplot(cor(wh18 %>%
 world <- map_data ('world')
 world <-- world %>% filter (region != "Antartica")
 world<-fortify(world)
-happiness.score17 <- wh15_17 %>% select(Country, Happiness_Score, year) %>% filter(year == 2018)
+happiness.score18 <- wh18 %>% select(Country, Happiness_Score, year) %>% filter(year == 2018)
 
 happiness_score18 <- wildcard(df = happines_score18, wildcard = "United States", values = "USA",
                               
