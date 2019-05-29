@@ -56,37 +56,21 @@ world <- map_data ('world')
 world <- world %>% filter (region != "Antartica")
 world<-fortify(world)
 happiness_score18 <- wh18 %>% select(Country, Happiness_Score)
-
 happiness_score18 <- wildcard(df = happiness_score18, wildcard = "United States", values = "USA",
-                              
                               expand = TRUE, rules = NULL)
-
 happiness_score18 <- wildcard(df = happiness_score18, wildcard = "United Kingdom", values = "UK",
-                              
                               expand = TRUE, rules = NULL)
-
-
-
 happiness_score18 <- wildcard(df = happiness_score18, wildcard = "Democratic Republic of the Congo", values = "Congo (Kinshasa)",
-                              
                               expand = TRUE, rules = NULL)
 
 ggplot() + 
-  
   geom_map(data=world, map=world,
-           
            aes(x=long, y=lat, group=group, map_id=region),
-           
            fill="white", colour="black") + 
-  
   geom_map(data=happiness_score18, map=world,
-           
            aes(fill=Happiness_Score, map_id=Country),
-           
            colour="black") + 
-  
   scale_fill_continuous(low="red", high="yellow",
-                        
                         guide="colorbar") + 
   
   labs(title = "World Happiness Score in 2018")
@@ -94,53 +78,30 @@ ggplot() +
 
 #boxplot
 names(wh18)[3] <- "Happiness_Score"
-
 ggplot(wh18, aes(x=Region, y= Happiness_Score, colour = Region)) + 
-  
   geom_boxplot() + 
-  
   theme(axis.text.x = element_text(angle = 60, hjust = 1)) + 
-  
   labs(title = "Happiness Score Boxplot",
-       
        x = "Region",
-       
        y = "Happiness Score")
 
 
 #top 5 worst 5
 world_happiness18 <- wh18 #%>% filter(year == 2018)
-
 top5 <- world_happiness18 %>% head(5) %>% mutate(Level = "TOP5")
-
 worst5 <- world_happiness18 %>% tail(5) %>% mutate(Level = "WORST5")
-
-
-
 comparison <- bind_rows(top5, worst5)
-
-
-
 comparison$Level <- as.factor(comparison$Level)
-
 comparison <- transform(comparison, Level = factor(Level, levels = c("TOP5", "WORST5" )))
 
 datatable(comparison,
-          
           options = list(
-            
             lengthMenu = c(5, 10, 15)
-            
           ),
-          
           caption = 
-            
             htmltools::tags$caption(
-              
               style = 'caption-side: bottom; text-align: center;', 
-              
               htmltools::em('Data table that only includes top5 and worst5 countries'))
-          
 )
 
 #dimnames (mydata) = list (c("1","2","3","4","5","6","7"),
@@ -203,7 +164,6 @@ shinyUI <- fluidPage(
      )),
   
   ggplot() + 
-  
       geom_map(data=world, map=world,
                aes(x=long, y=lat, group=group, map_id=region),
                fill="white", colour="black") + 
@@ -212,7 +172,7 @@ shinyUI <- fluidPage(
                colour="black") + 
       scale_fill_continuous(low="red", high="yellow",
                             guide="colorbar") + 
-      labs(title = "World Happiness Score in 2017"),
+      labs(title = "World Happiness Score in 2018"),
     
     
     sidebarLayout(
@@ -249,8 +209,6 @@ shinyUI <- fluidPage(
     )
 )
 
- 
-
 
 # Define server logic required to draw a histogram
 server <- function(input, output, session){
@@ -263,7 +221,6 @@ server <- function(input, output, session){
                         n_responses, ".")
     showNotification(response, duration=0, type = "message")
   })
-  
   observeEvent(input$clear, {
     resetForm(session)
   })
@@ -273,4 +230,3 @@ server <- function(input, output, session){
   
 # Run the application 
 shinyApp(ui= shinyUI, server=server)
-
