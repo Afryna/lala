@@ -6,6 +6,8 @@
 #
 #    http://shiny.rstudio.com/
 #
+install.packages("rmarkdown")
+
 library(shiny)
 library (data.table)
 library (tidyverse)
@@ -40,41 +42,20 @@ str(wh18)
 summary(wh18)
 
 
-#analysis
-corrplot(cor(wh18 %>%
-           select (Happiness_Score:Health_Life_Expectancy)),
-          method = "color",
-          sig.level = 0.01,
-          insig = "blank",
-          addCoef.col = "black",
-          tl.srt = 45,
-          type = "upper"
 
-)
 
-world <- map_data ('world')
-world <- world %>% filter (region != "Antartica")
-world<-fortify(world)
-happiness_score18 <- wh18 %>% select(Country, Happiness_Score)
-happiness_score18 <- wildcard(df = happiness_score18, wildcard = "United States", values = "USA",
-                              expand = TRUE, rules = NULL)
-happiness_score18 <- wildcard(df = happiness_score18, wildcard = "United Kingdom", values = "UK",
-                              expand = TRUE, rules = NULL)
-happiness_score18 <- wildcard(df = happiness_score18, wildcard = "Democratic Republic of the Congo", values = "Congo (Kinshasa)",
-                              expand = TRUE, rules = NULL)
+#world <- map_data ('world')
+#world <- world %>% filter (region != "Antartica")
+#world<-fortify(world)
+#happiness_score18 <- wh18 %>% select(Country, Happiness_Score)
+#happiness_score18 <- wildcard(df = happiness_score18, wildcard = "United States", values = "USA",
+ #                             expand = TRUE, rules = NULL)
+#happiness_score18 <- wildcard(df = happiness_score18, wildcard = "United Kingdom", values = "UK",
+#                              expand = TRUE, rules = NULL)
+#happiness_score18 <- wildcard(df = happiness_score18, wildcard = "Democratic Republic of the Congo", values = "Congo (Kinshasa)",
+#                              expand = TRUE, rules = NULL)
 
-ggplot() + 
-  geom_map(data=world, map=world,
-           aes(x=long, y=lat, group=group, map_id=region),
-           fill="white", colour="black") + 
-  geom_map(data=happiness_score18, map=world,
-           aes(fill=Happiness_Score, map_id=Country),
-           colour="black") + 
-  scale_fill_continuous(low="red", high="yellow",
-                        guide="colorbar") + 
-  
-  labs(title = "World Happiness Score in 2018")
-## Warning: Ignoring unknown aesthetics: x, y
+
 
 #boxplot
 names(wh18)[3] <- "Happiness_Score"
@@ -85,24 +66,40 @@ ggplot(wh18, aes(x=Region, y= Happiness_Score, colour = Region)) +
        x = "Region",
        y = "Happiness Score")
 
+#ggplot() + 
+ # geom_map(data=world, map=world,
+#           aes(x=long, y=lat, group=group, map_id=region),
+  #         fill="white", colour="black") + 
+  #geom_map(data=happiness_score18, map=world,
+   #        aes(fill=Happiness_Score, map_id=Country),
+    #       colour="black") + 
+  #scale_fill_continuous(low="red", high="yellow",
+   #                     guide="colorbar") + 
+  
+  #labs(title = "World Happiness Score in 2018")
+## Warning: Ignoring unknown aesthetics: x, y
+
+#hist (wh18.Happiness_Score, main = "Histogram of Happiness Score Worldwide in 2018", xlab = "Happiness Score")
+
+
 
 #top 5 worst 5
-world_happiness18 <- wh18 #%>% filter(year == 2018)
-top5 <- world_happiness18 %>% head(5) %>% mutate(Level = "TOP5")
-worst5 <- world_happiness18 %>% tail(5) %>% mutate(Level = "WORST5")
-comparison <- bind_rows(top5, worst5)
-comparison$Level <- as.factor(comparison$Level)
-comparison <- transform(comparison, Level = factor(Level, levels = c("TOP5", "WORST5" )))
+#world_happiness18 <- wh18 #%>% filter(year == 2018)
+#top5 <- world_happiness18 %>% head(5) %>% mutate(Level = "TOP5")
+#worst5 <- world_happiness18 %>% tail(5) %>% mutate(Level = "WORST5")
+#comparison <- bind_rows(top5, worst5)
+#comparison$Level <- as.factor(comparison$Level)
+#comparison <- transform(comparison, Level = factor(Level, levels = c("TOP5", "WORST5" )))
 
-datatable(comparison,
-          options = list(
-            lengthMenu = c(5, 10, 15)
-          ),
-          caption = 
-            htmltools::tags$caption(
-              style = 'caption-side: bottom; text-align: center;', 
-              htmltools::em('Data table that only includes top5 and worst5 countries'))
-)
+#datatable(comparison,
+       #   options = list(
+        #    lengthMenu = c(5, 10, 15)
+        #  ),
+        #  caption = 
+        #    htmltools::tags$caption(
+        #      style = 'caption-side: bottom; text-align: center;', 
+        #      htmltools::em('Data table that only includes top5 and worst5 countries'))
+#)
 
 #dimnames (mydata) = list (c("1","2","3","4","5","6","7"),
                          # c("Southern Asia" = "a","Central and Eastern Europe" = "b","North America" = "c","Southeastern Asia" = "d","Western Europe" = "e","Australia and New Zealand" = "f","Eastern Asia" = "g","Sub-Saharan Africa" = "h"), selected = "a")
@@ -154,7 +151,6 @@ resetForm <- function (session) {
 shinyUI <- fluidPage(
  
   # Application title
-  titlePanel("The Happy Countries"),
   tags$head(
     tags$style(HTML("
                     .shiny-input-container:not(.shiny-input-container-inline){
@@ -163,19 +159,20 @@ shinyUI <- fluidPage(
                     }"
      )),
   
-  ggplot() + 
-      geom_map(data=world, map=world,
-               aes(x=long, y=lat, group=group, map_id=region),
-               fill="white", colour="black") + 
-      geom_map(data=happiness_score18, map=world,
-               aes(fill=Happiness_Score, map_id=Country),
-               colour="black") + 
-      scale_fill_continuous(low="red", high="yellow",
-                            guide="colorbar") + 
-      labs(title = "World Happiness Score in 2018"),
+  #ggplot() + 
+     # geom_#map(data=world, map=world,
+             #  aes(x=long, y=lat, group=group, map_id=region),
+            #   fill="white", colour="black") + 
+     # geom_map(data=happiness_score18, map=world,
+         #      aes(fill=Happiness_Score, map_id=Country),
+     #     #     colour="black") + 
+    #  scale_fill_continuous(low="red", high="yellow",
+    #                        guide="colorbar") + 
+     # labs(title = "World Happiness Score in 2018"),
     
     
     sidebarLayout(
+     
       sidebarPanel(
         selectInput(inputId = "gen",  # Give the input a name "genotype"
                     label = "1. Select a region",  # Give the input a label to be displayed in the app
@@ -189,10 +186,25 @@ shinyUI <- fluidPage(
         #textInput(inputId = "text", 
                  # label = "4. Enter some text to be displayed", "")
       ),
-      mainPanel()
+      
+
+      
+      mainPanel(
+        
+        #analysis
+        corrplot(cor(wh18 %>%
+                       select (Happiness_Score:Health_Life_Expectancy)),
+                 method = "color",
+                 sig.level = 0.01,
+                 insig = "blank",
+                 addCoef.col = "black",
+                 tl.srt = 45,
+                 type = "upper"
+                 
+        )
+      )
     ),
- 
-    
+
   h3("My Survey"),
   p("Please fill out the following brief survey..."),
   
@@ -224,9 +236,11 @@ server <- function(input, output, session){
   observeEvent(input$clear, {
     resetForm(session)
   })
+
   
- 
+  
 }
   
 # Run the application 
 shinyApp(ui= shinyUI, server=server)
+
