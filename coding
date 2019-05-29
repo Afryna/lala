@@ -53,11 +53,11 @@ corrplot(cor(wh18 %>%
 )
 
 world <- map_data ('world')
-world <-- world %>% filter (region != "Antartica")
+world <- world %>% filter (region != "Antartica")
 world<-fortify(world)
-happiness.score18 <- wh18 %>% select(Country, Happiness_Score, year) %>% filter(year == 2018)
+happiness_score18 <- wh18 %>% select(Country, Happiness_Score)
 
-happiness_score18 <- wildcard(df = happines_score18, wildcard = "United States", values = "USA",
+happiness_score18 <- wildcard(df = happiness_score18, wildcard = "United States", values = "USA",
                               
                               expand = TRUE, rules = NULL)
 
@@ -79,7 +79,7 @@ ggplot() +
            
            fill="white", colour="black") + 
   
-  geom_map(data=happiness.score18, map=world,
+  geom_map(data=happiness_score18, map=world,
            
            aes(fill=Happiness_Score, map_id=Country),
            
@@ -109,11 +109,11 @@ ggplot(wh18, aes(x=Region, y= Happiness_Score, colour = Region)) +
 
 
 #top 5 worst 5
-world.happiness18 <- wh18 %>% filter(year == 2018)
+world_happiness18 <- wh18 #%>% filter(year == 2018)
 
-top5 <- world.happiness18 %>% head(5) %>% mutate(Level = "TOP5")
+top5 <- world_happiness18 %>% head(5) %>% mutate(Level = "TOP5")
 
-worst5 <- world.happiness18 %>% tail(5) %>% mutate(Level = "WORST5")
+worst5 <- world_happiness18 %>% tail(5) %>% mutate(Level = "WORST5")
 
 
 
@@ -207,7 +207,7 @@ shinyUI <- fluidPage(
       geom_map(data=world, map=world,
                aes(x=long, y=lat, group=group, map_id=region),
                fill="white", colour="black") + 
-      geom_map(data=happiness.score17, map=world,
+      geom_map(data=happiness_score18, map=world,
                aes(fill=Happiness_Score, map_id=Country),
                colour="black") + 
       scale_fill_continuous(low="red", high="yellow",
