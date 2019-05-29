@@ -7,41 +7,157 @@
 #    http://shiny.rstudio.com/
 #
 library(shiny)
-library(shinydashboard)
+library (data.table)
+library (tidyverse)
+library(DT)
+library (corrplot)
+library (plotly)
+library (ggplot2)
+library (PerformanceAnalytics)
+#library(shinydashboard)
 
 mydata<-read.csv(file = "https://raw.githubusercontent.com/Afryna/lala/master/2018.csv", stringsAsFactors = TRUE, header = TRUE)
 #setwd("C:\Users\afryn\Documents\WhoIsHappy")
 
 
 #Data import and Cleaning
-#wh18 <- fread("https://raw.githubusercontent.com/Afryna/lala/master/2018.csv", data.table = FALSE)
+wh18 <- fread("https://raw.githubusercontent.com/Afryna/lala/master/2018.csv", data.table = FALSE)
 
-#wh18$year <- 2018
+wh18$year <- 2018
 
-names(mydata)[1] <- "Happiness Rank"
-names(mydata)[2] <- "Country Rank"
-names(mydata)[3] <- "Happiness Score"
+names(wh18)[1] <- "Happiness Rank"
+names(wh18)[2] <- "Country Rank"
+names(wh18)[3] <- "Happiness Score"
+names(wh18)[6] <- "Healty Life Expectancy"
 mydata <- data.matrix(mydata)
 
-names(mydata) <- c("Country", "Happiness_Rank", "Happiness_Score")
+names(wh18) <- c("Country", "Happiness_Rank", "Happiness_Score","GDP_Per_Capita","Social_Support","Health_Life_Expectancy","Freedom_To_Make_Life_Choices","Generosity","Perceptions_Of_Corruption","Residual","Year")
 
-dimnames (mydata) = list (c("1","2","3","4","5","6","7","8","9","10"),
-                          c("Southern Asia" = "a","Central and Eastern Europe" = "b","North America" = "c","Southeastern Asia" = "d","Western Europe" = "e","Australia and New Zealand" = "f","Eastern Asia" = "g","Sub-Saharan Africa" = "h"), selected = "a")
+head(wh18)
+str(wh18)
+summary(wh18)
+
+
+#analysis
+corrplot(cor(wh18 %>%
+           select (Happiness_Score:Health_Life_Expectancy)),
+          method = "color",
+          sig.level = 0.01,
+          insig = "blank",
+          addCoef.col = "black",
+          tl.srt = 45,
+          type = "upper"
+
+)
+
+world <- map_data ('world')
+world <-- world %>% filter (region != "Antartica")
+world<-fortify(world)
+happiness.score17 <- wh15_17 %>% select(Country, Happiness_Score, year) %>% filter(year == 2018)
+
+happiness_score18 <- wildcard(df = happines_score18, wildcard = "United States", values = "USA",
+                              
+                              expand = TRUE, rules = NULL)
+
+happiness_score18 <- wildcard(df = happiness_score18, wildcard = "United Kingdom", values = "UK",
+                              
+                              expand = TRUE, rules = NULL)
+
+
+
+happiness_score18 <- wildcard(df = happiness_score18, wildcard = "Democratic Republic of the Congo", values = "Congo (Kinshasa)",
+                              
+                              expand = TRUE, rules = NULL)
+
+ggplot() + 
+  
+  geom_map(data=world, map=world,
+           
+           aes(x=long, y=lat, group=group, map_id=region),
+           
+           fill="white", colour="black") + 
+  
+  geom_map(data=happiness.score18, map=world,
+           
+           aes(fill=Happiness_Score, map_id=Country),
+           
+           colour="black") + 
+  
+  scale_fill_continuous(low="red", high="yellow",
+                        
+                        guide="colorbar") + 
+  
+  labs(title = "World Happiness Score in 2018")
+## Warning: Ignoring unknown aesthetics: x, y
+
+#boxplot
+names(wh18)[3] <- "Happiness_Score"
+
+ggplot(wh18, aes(x=Region, y= Happiness_Score, colour = Region)) + 
+  
+  geom_boxplot() + 
+  
+  theme(axis.text.x = element_text(angle = 60, hjust = 1)) + 
+  
+  labs(title = "Happiness Score Boxplot",
+       
+       x = "Region",
+       
+       y = "Happiness Score")
+
+
+#top 5 worst 5
+world.happiness18 <- wh18 %>% filter(year == 2018)
+
+top5 <- world.happiness18 %>% head(5) %>% mutate(Level = "TOP5")
+
+worst5 <- world.happiness18 %>% tail(5) %>% mutate(Level = "WORST5")
+
+
+
+comparison <- bind_rows(top5, worst5)
+
+
+
+comparison$Level <- as.factor(comparison$Level)
+
+comparison <- transform(comparison, Level = factor(Level, levels = c("TOP5", "WORST5" )))
+
+datatable(comparison,
+          
+          options = list(
+            
+            lengthMenu = c(5, 10, 15)
+            
+          ),
+          
+          caption = 
+            
+            htmltools::tags$caption(
+              
+              style = 'caption-side: bottom; text-align: center;', 
+              
+              htmltools::em('Data table that only includes top5 and worst5 countries'))
+          
+)
+
+#dimnames (mydata) = list (c("1","2","3","4","5","6","7"),
+                         # c("Southern Asia" = "a","Central and Eastern Europe" = "b","North America" = "c","Southeastern Asia" = "d","Western Europe" = "e","Australia and New Zealand" = "f","Eastern Asia" = "g","Sub-Saharan Africa" = "h"), selected = "a")
 
 fields <- c("text_demo","slider_demo", "submit_demo", "radio_demo", "action_demo")
 
 #saveData <- function(input){
-#put variables in a data frame
-# data <- data.frame(matrix(nrow=1,ncol=0))
-#for (x in fields) {
-# var <- input[[x]]
-#  if (length(var)>1) {
-#   data[[x]] <- list (var)
-#} else {
-# data[[x]] <- var
-#}
-#}
-#data$submit <- submitbutton()
+  #put variables in a data frame
+ # data <- data.frame(matrix(nrow=1,ncol=0))
+  #for (x in fields) {
+   # var <- input[[x]]
+  #  if (length(var)>1) {
+   #   data[[x]] <- list (var)
+    #} else {
+     # data[[x]] <- var
+    #}
+  #}
+  #data$submit <- submitbutton()
 #}
 
 
@@ -73,7 +189,7 @@ resetForm <- function (session) {
 
 # Define UI for application that draws a histogram
 shinyUI <- fluidPage(
-  
+ 
   # Application title
   titlePanel("The Happy Countries"),
   tags$head(
@@ -83,8 +199,9 @@ shinyUI <- fluidPage(
                     max-width: 100%;
                     }"
      )),
-    
-    ggplot() + 
+  
+  ggplot() + 
+  
       geom_map(data=world, map=world,
                aes(x=long, y=lat, group=group, map_id=region),
                fill="white", colour="black") + 
@@ -108,29 +225,29 @@ shinyUI <- fluidPage(
                     label = "3.How would you rank the happines of the country you live in(currently), on a scale from 0-10?",
                     min=0, max=10, value= c(5))
         #textInput(inputId = "text", 
-        # label = "4. Enter some text to be displayed", "")
+                 # label = "4. Enter some text to be displayed", "")
       ),
       mainPanel()
     ),
+ 
     
-    
-    h3("My Survey"),
-    p("Please fill out the following brief survey..."),
-    
-    fluidRow(
-      column(width=6, text_demo)
-    ),
-    
-    fluidRow(
-      column(width=4, radio_demo)
-    ),
-    
-    actionButton("submit",  "Submit"),
-    action_demo
-    )
-    )
+  h3("My Survey"),
+  p("Please fill out the following brief survey..."),
+  
+  fluidRow(
+    column(width=6, text_demo)
+ ),
+  
+  fluidRow(
+   column(width=4, radio_demo)
+  ),
 
+  actionButton("submit",  "Submit"),
+  action_demo
+    )
+)
 
+ 
 
 
 # Define server logic required to draw a histogram
@@ -149,8 +266,9 @@ server <- function(input, output, session){
     resetForm(session)
   })
   
-  
+ 
 }
-
+  
 # Run the application 
 shinyApp(ui= shinyUI, server=server)
+
