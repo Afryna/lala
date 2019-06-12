@@ -1,0 +1,56 @@
+library(shiny)
+library(treemap)
+library(plotly)
+require (shinydashboard)
+library(dplyr)
+library(ggplot2)
+library(googleVis)
+library(RColorBrewer)
+library(corrplot)
+library(gapminder)
+library(tidyr)
+
+
+data<-read.csv("2018.csv")
+year <- (2018)
+
+
+
+#define ui 
+ui <- fluidPage(
+  titlePanel("Who Is Happy"),
+  
+  sidebarPanel(
+    selectInput("score", "How many country score:",
+    choices = colnames(data)),
+    
+  hr(),
+  helpText("Data from World Happiness 2018")),
+  
+  mainPanel(
+    plotOutput("scorePlot")
+  ))
+
+  
+
+
+# Define server logic required to draw a histogram
+server <- function(input, output) {
+  
+   output$scorePlot <- renderPlot({
+      #tree plot
+     barplot(data [,input$score] * 1,
+             main = input$score,
+             ylab = "Number of country",
+             xlab = "Score")
+     # generate bins based on input$bins from ui.R
+      #x    <- faithful[, 2] 
+      #bins <- seq(min(x), max(x), length.out = input$bins + 1)
+      
+      # draw the histogram with the specified number of bins
+      #hist(x, breaks = bins, col = 'pink', border = 'white')
+   })
+}
+
+# Run the application 
+shinyApp(ui = ui, server = server)
